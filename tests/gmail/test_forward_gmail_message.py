@@ -5,6 +5,7 @@ Unit tests for forward_gmail_message
 import pytest
 from unittest.mock import Mock
 from email import message_from_bytes
+from email.policy import default as default_policy
 import base64
 import sys
 import os
@@ -17,21 +18,24 @@ from gmail.gmail_tools import _forward_gmail_message_impl
 def get_sent_mime_message(mock_service):
     """Decode the raw MIME message passed to messages().send()."""
     raw = mock_service.users().messages().send.call_args.kwargs["body"]["raw"]
-    return message_from_bytes(base64.urlsafe_b64decode(raw))
+    return message_from_bytes(base64.urlsafe_b64decode(raw), policy=default_policy)
 
 
 def get_body_and_attachments(mime_msg):
-    """Return (body_part, [attachment_parts]) for plain or multipart messages."""
-    if not mime_msg.is_multipart():
-        return mime_msg, []
-    parts = mime_msg.get_payload()
-    return parts[0], parts[1:]
+    """Return (preferred body part, [attachment parts]) for a sent message.
+
+    Prefers the HTML body when present (HTML sends produce a multipart/alternative
+    with a plain-text fallback), otherwise returns the plain-text body.
+    """
+    body_part = mime_msg.get_body(preferencelist=("html", "plain"))
+    attachments = list(mime_msg.iter_attachments())
+    return body_part, attachments
 
 
 def get_body_text(mime_msg):
-    """Decode the text/body part of a sent MIME message to a string."""
+    """Decode the preferred body part of a sent message to a string."""
     body_part, _ = get_body_and_attachments(mime_msg)
-    return body_part.get_payload(decode=True).decode()
+    return body_part.get_content()
 
 
 def create_mock_message(
