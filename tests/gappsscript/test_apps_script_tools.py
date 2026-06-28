@@ -237,11 +237,14 @@ async def test_list_deployments():
 
 @pytest.mark.asyncio
 async def test_update_deployment():
-    """Test updating deployment"""
+    """Test updating deployment wraps fields in deploymentConfig (issue #836)."""
     mock_service = Mock()
     mock_response = {
         "deploymentId": "deploy123",
-        "description": "Updated description",
+        "deploymentConfig": {
+            "scriptId": "test123",
+            "description": "Updated description",
+        },
     }
 
     mock_service.projects().deployments().update().execute.return_value = mock_response
@@ -254,7 +257,58 @@ async def test_update_deployment():
         description="Updated description",
     )
 
+    # The Apps Script API rejects a flat body; fields must live under
+    # ``deploymentConfig`` and the config must always carry ``scriptId``.
+    _, update_kwargs = mock_service.projects().deployments().update.call_args
+    assert update_kwargs["scriptId"] == "test123"
+    assert update_kwargs["deploymentId"] == "deploy123"
+    assert update_kwargs["body"] == {
+        "deploymentConfig": {
+            "scriptId": "test123",
+            "description": "Updated description",
+        }
+    }
+    assert "description" not in update_kwargs["body"]
+
     assert "Updated deployment: deploy123" in result
+    assert "Updated description" in result
+
+
+@pytest.mark.asyncio
+async def test_update_deployment_with_version_number():
+    """Updating with a version_number repoints the deployment (issue #836)."""
+    mock_service = Mock()
+    mock_response = {
+        "deploymentId": "deploy123",
+        "deploymentConfig": {
+            "scriptId": "test123",
+            "versionNumber": 2,
+            "description": "v2 - updated layout",
+        },
+    }
+
+    mock_service.projects().deployments().update().execute.return_value = mock_response
+
+    result = await _update_deployment_impl(
+        service=mock_service,
+        user_google_email="test@example.com",
+        script_id="test123",
+        deployment_id="deploy123",
+        description="v2 - updated layout",
+        version_number=2,
+    )
+
+    _, update_kwargs = mock_service.projects().deployments().update.call_args
+    assert update_kwargs["body"] == {
+        "deploymentConfig": {
+            "scriptId": "test123",
+            "versionNumber": 2,
+            "description": "v2 - updated layout",
+        }
+    }
+
+    assert "Version: 2" in result
+    assert "v2 - updated layout" in result
 
 
 @pytest.mark.asyncio

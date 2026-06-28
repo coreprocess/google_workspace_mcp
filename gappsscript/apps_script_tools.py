@@ -531,6 +531,7 @@ async def manage_deployment(
     deployment_id: Optional[str] = None,
     description: Optional[str] = None,
     version_description: Optional[str] = None,
+    version_number: Optional[int] = None,
 ) -> str:
     """
     Manages Apps Script deployments. Supports creating, updating, and deleting deployments.
@@ -543,6 +544,8 @@ async def manage_deployment(
         deployment_id: The deployment ID (required for update and delete)
         description: Deployment description (required for create and update)
         version_description: Optional version description (for create only)
+        version_number: Version number to point the deployment at (for update only).
+            Required to roll a deployment forward to a newly created script version.
 
     Returns:
         str: Formatted string with deployment details or confirmation
@@ -560,7 +563,12 @@ async def manage_deployment(
         if description is None or description.strip() == "":
             raise ValueError("description is required for update action")
         return await _update_deployment_impl(
-            service, user_google_email, script_id, deployment_id, description
+            service,
+            user_google_email,
+            script_id,
+            deployment_id,
+            description,
+            version_number,
         )
     elif action == "delete":
         if not deployment_id:
@@ -642,15 +650,27 @@ async def _update_deployment_impl(
     script_id: str,
     deployment_id: str,
     description: Optional[str] = None,
+    version_number: Optional[int] = None,
 ) -> str:
-    """Internal implementation for update_deployment."""
+    """Internal implementation for update_deployment.
+
+    The Apps Script ``projects.deployments.update`` endpoint expects every
+    field nested inside a ``deploymentConfig`` object; sending them at the top
+    level fails with ``400 Invalid JSON payload``. ``scriptId`` is always part
+    of the config, and ``versionNumber`` is required to repoint a deployment at
+    a newer script version.
+    """
     logger.info(
         f"[update_deployment] Email: {user_google_email}, Script: {script_id}, Deployment: {deployment_id}"
     )
 
-    request_body = {}
+    deployment_config: Dict[str, Any] = {"scriptId": script_id}
+    if version_number is not None:
+        deployment_config["versionNumber"] = version_number
     if description:
-        request_body["description"] = description
+        deployment_config["description"] = description
+
+    request_body = {"deploymentConfig": deployment_config}
 
     deployment = await asyncio.to_thread(
         service.projects()
@@ -659,10 +679,17 @@ async def _update_deployment_impl(
         .execute
     )
 
+    deployment_config_resp = deployment.get("deploymentConfig", {})
+    resolved_version = deployment_config_resp.get("versionNumber", version_number)
+    resolved_description = deployment_config_resp.get(
+        "description", deployment.get("description", "No description")
+    )
+
     output = [
         f"Updated deployment: {deployment_id}",
         f"Script: {script_id}",
-        f"Description: {deployment.get('description', 'No description')}",
+        f"Version: {resolved_version if resolved_version is not None else 'unchanged'}",
+        f"Description: {resolved_description}",
     ]
 
     logger.info(f"[update_deployment] Updated deployment {deployment_id}")
