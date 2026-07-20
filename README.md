@@ -1,5 +1,8 @@
 <!-- mcp-name: io.github.taylorwilsdon/workspace-mcp -->
 
+> [!WARNING]
+> **Temporary fork.** This package is published to PyPI as [`google-workspace-mcp-with-body-save`](https://pypi.org/project/google-workspace-mcp-with-body-save/), a temporary fork of [`workspace-mcp`](https://pypi.org/project/workspace-mcp/) by Taylor Wilsdon. It adds save-body-to-file support for Gmail message/thread content and exists only while that change awaits merge upstream. Once the upstream release includes it, switch back to `workspace-mcp` — this fork is not maintained long-term. All credit for the underlying project goes to the upstream author.
+
 <div align="center">
 
 # <span style="color:#cad8d9">Google Workspace MCP Server</span> <img src="https://github.com/user-attachments/assets/b89524e4-6e6e-49e6-ba77-00d6df0c6e5c" width="80" align="right" />
@@ -192,9 +195,9 @@ export GOOGLE_OAUTH_CLIENT_ID="..."
 export GOOGLE_OAUTH_CLIENT_SECRET="..."
 
 # 2. Launch — pick a tier
-uvx workspace-mcp --tool-tier core       # essential tools
-uvx workspace-mcp --tool-tier extended   # core + management ops
-uvx workspace-mcp --tool-tier complete   # everything
+uvx google-workspace-mcp-with-body-save --tool-tier core       # essential tools
+uvx google-workspace-mcp-with-body-save --tool-tier extended   # core + management ops
+uvx google-workspace-mcp-with-body-save --tool-tier complete   # everything
 
 # Or cherry-pick services
 uv run main.py --tools gmail drive calendar
@@ -216,9 +219,9 @@ export OAUTHLIB_INSECURE_TRANSPORT=1
 export FASTMCP_SERVER_AUTH_GOOGLE_JWT_SIGNING_KEY="$(openssl rand -hex 32)"
 
 # 2. Launch — OAuth 2.1 requires HTTP transport
-uvx workspace-mcp --transport streamable-http --tool-tier core
-uvx workspace-mcp --transport streamable-http --tool-tier extended
-uvx workspace-mcp --transport streamable-http --tool-tier complete
+uvx google-workspace-mcp-with-body-save --transport streamable-http --tool-tier core
+uvx google-workspace-mcp-with-body-save --transport streamable-http --tool-tier extended
+uvx google-workspace-mcp-with-body-save --transport streamable-http --tool-tier complete
 
 # Or cherry-pick services
 uv run main.py --transport streamable-http --tools gmail drive calendar
@@ -313,7 +316,7 @@ If you want the GCS credential store backend, install the optional dependency fi
 ```bash
 uv sync --extra gcs
 # or
-pip install "workspace-mcp[gcs]"
+pip install "google-workspace-mcp-with-body-save[gcs]"
 ```
 
 ### Configuration
@@ -1039,7 +1042,7 @@ See the **[Quick Start Guide](https://workspacemcp.com/quick-start)** for setup 
   "mcpServers": {
     "google_workspace": {
       "command": "uvx",
-      "args": ["workspace-mcp"],
+      "args": ["google-workspace-mcp-with-body-save"],
       "env": {
         "GOOGLE_OAUTH_CLIENT_ID": "your-client-id",
         "GOOGLE_OAUTH_CLIENT_SECRET": "your-secret",
@@ -1060,7 +1063,7 @@ Add a new MCP server in LM Studio (Settings → MCP Servers) using the same JSON
   "mcpServers": {
     "google_workspace": {
       "command": "uvx",
-      "args": ["workspace-mcp"],
+      "args": ["google-workspace-mcp-with-body-save"],
       "env": {
         "GOOGLE_OAUTH_CLIENT_ID": "your-client-id",
         "GOOGLE_OAUTH_CLIENT_SECRET": "your-secret",
@@ -1084,7 +1087,7 @@ If you’re developing, deploying to servers, or using another MCP-capable clien
 ```bash
 # Requires Python 3.10+ and uvx
 # First, set credentials (see Credential Configuration above)
-uvx workspace-mcp --tool-tier core  # or --tools gmail drive calendar
+uvx google-workspace-mcp-with-body-save --tool-tier core  # or --tools gmail drive calendar
 ```
 
 > **Note**: Configure [OAuth credentials](#credential-configuration) before running. Supports environment variables, `.env` file, or `client_secret.json`.
@@ -1238,9 +1241,9 @@ export WORKSPACE_MCP_OAUTH_PROXY_VALKEY_HOST=redis.example.com
 export WORKSPACE_MCP_OAUTH_PROXY_VALKEY_PORT=6379
 ```
 
-> Disk support requires `workspace-mcp[disk]` (or `py-key-value-aio[disk]`) when installing from source.
+> Disk support requires `google-workspace-mcp-with-body-save[disk]` (or `py-key-value-aio[disk]`) when installing from source.
 > The official Docker image includes the `disk` extra by default.
-> Valkey support is optional. Install `workspace-mcp[valkey]` (or `py-key-value-aio[valkey]`) only if you enable the Valkey backend.
+> Valkey support is optional. Install `google-workspace-mcp-with-body-save[valkey]` (or `py-key-value-aio[valkey]`) only if you enable the Valkey backend.
 > Windows: building `valkey-glide` from source requires MSVC C++ build tools with C11 support. If you see `aws-lc-sys` C11 errors, set `CFLAGS=/std:c11`.
 
 <details open>
@@ -1456,21 +1459,21 @@ You also have options for:
 # Configure credentials first (see Credential Configuration section)
 
 # Start with specific tools only
-uvx workspace-mcp --tools gmail drive calendar tasks
+uvx google-workspace-mcp-with-body-save --tools gmail drive calendar tasks
 
 # Start with tool tiers (recommended for most users)
-uvx workspace-mcp --tool-tier core      # Essential tools
-uvx workspace-mcp --tool-tier extended  # Core + additional features
-uvx workspace-mcp --tool-tier complete  # All tools
+uvx google-workspace-mcp-with-body-save --tool-tier core      # Essential tools
+uvx google-workspace-mcp-with-body-save --tool-tier extended  # Core + additional features
+uvx google-workspace-mcp-with-body-save --tool-tier complete  # All tools
 
 # Start in HTTP mode for debugging
 export MCP_ENABLE_OAUTH21=true
 export GOOGLE_OAUTH_CLIENT_ID="..."
-uvx workspace-mcp --transport streamable-http
+uvx google-workspace-mcp-with-body-save --transport streamable-http
 ```
 </details>
 
-*Requires Python 3.10+ and [uvx](https://github.com/astral-sh/uv). The package is available on [PyPI](https://pypi.org/project/workspace-mcp).*
+*Requires Python 3.10+ and [uvx](https://github.com/astral-sh/uv). This fork is available on [PyPI](https://pypi.org/project/google-workspace-mcp-with-body-save).*
 
 ### Development Installation
 
@@ -1600,7 +1603,7 @@ The server includes an abstract credential store API with pluggable backends for
 ```bash
 # Install the optional dependency if you plan to use the GCS backend:
 # uv sync --extra gcs
-# or: pip install "workspace-mcp[gcs]"
+# or: pip install "google-workspace-mcp-with-body-save[gcs]"
 #
 # Select backend (default: local_directory). Supported: local_directory, gcs
 export WORKSPACE_MCP_CREDENTIAL_STORE_BACKEND="gcs"

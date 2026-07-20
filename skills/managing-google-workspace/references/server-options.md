@@ -53,12 +53,12 @@ Plugin users cannot pass CLI args directly. Use `WORKSPACE_MCP_TOOLS` and `WORKS
 ## MCP config examples
 
 ```json
-{"command": "uvx", "args": ["workspace-mcp"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
-{"command": "uvx", "args": ["workspace-mcp", "--single-user"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
-{"command": "uvx", "args": ["workspace-mcp", "--single-user", "--read-only"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
-{"command": "uvx", "args": ["workspace-mcp", "--single-user", "--tools", "gmail", "drive"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
-{"command": "uvx", "args": ["workspace-mcp", "--single-user", "--tool-tier", "core"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
-{"command": "uvx", "args": ["workspace-mcp", "--transport", "streamable-http"], "env": {"MCP_ENABLE_OAUTH21": "true", "GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
+{"command": "uvx", "args": ["google-workspace-mcp-with-body-save"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
+{"command": "uvx", "args": ["google-workspace-mcp-with-body-save", "--single-user"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
+{"command": "uvx", "args": ["google-workspace-mcp-with-body-save", "--single-user", "--read-only"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
+{"command": "uvx", "args": ["google-workspace-mcp-with-body-save", "--single-user", "--tools", "gmail", "drive"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
+{"command": "uvx", "args": ["google-workspace-mcp-with-body-save", "--single-user", "--tool-tier", "core"], "env": {"GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
+{"command": "uvx", "args": ["google-workspace-mcp-with-body-save", "--transport", "streamable-http"], "env": {"MCP_ENABLE_OAUTH21": "true", "GOOGLE_OAUTH_CLIENT_ID": "...", "GOOGLE_OAUTH_CLIENT_SECRET": "..."}}
 ```
 
 ## Deployment

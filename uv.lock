@@ -717,6 +717,148 @@ wheels = [
 ]
 
 [[package]]
+name = "google-workspace-mcp-with-body-save"
+version = "1.23.0"
+source = { editable = "." }
+dependencies = [
+    { name = "cryptography" },
+    { name = "defusedxml" },
+    { name = "fastapi" },
+    { name = "fastmcp" },
+    { name = "google-api-python-client" },
+    { name = "google-auth-httplib2" },
+    { name = "google-auth-oauthlib" },
+    { name = "html2text" },
+    { name = "httpx" },
+    { name = "markdown-it-py" },
+    { name = "py-key-value-aio" },
+    { name = "pyjwt" },
+    { name = "pypdf" },
+    { name = "python-dotenv" },
+    { name = "pytz" },
+    { name = "pyyaml" },
+    { name = "urllib3" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "google-cloud-storage" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "requests" },
+    { name = "ruff" },
+    { name = "tomlkit" },
+    { name = "twine" },
+]
+disk = [
+    { name = "py-key-value-aio", extra = ["filetree"] },
+]
+gcs = [
+    { name = "google-cloud-storage" },
+]
+release = [
+    { name = "tomlkit" },
+    { name = "twine" },
+]
+test = [
+    { name = "google-cloud-storage" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "requests" },
+]
+valkey = [
+    { name = "py-key-value-aio", extra = ["valkey"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "google-cloud-storage" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "requests" },
+    { name = "ruff" },
+    { name = "tomlkit" },
+    { name = "twine" },
+]
+disk = [
+    { name = "py-key-value-aio", extra = ["filetree"] },
+]
+release = [
+    { name = "tomlkit" },
+    { name = "twine" },
+]
+test = [
+    { name = "google-cloud-storage" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "requests" },
+]
+valkey = [
+    { name = "py-key-value-aio", extra = ["valkey"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "cryptography", specifier = ">=48.0.1" },
+    { name = "defusedxml", specifier = ">=0.7.1" },
+    { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "fastmcp", specifier = ">=3.4.2" },
+    { name = "google-api-python-client", specifier = ">=2.168.0" },
+    { name = "google-auth-httplib2", specifier = ">=0.2.0" },
+    { name = "google-auth-oauthlib", specifier = ">=1.2.2" },
+    { name = "google-cloud-storage", marker = "extra == 'dev'", specifier = ">=2.18.0" },
+    { name = "google-cloud-storage", marker = "extra == 'gcs'", specifier = ">=2.18.0" },
+    { name = "google-cloud-storage", marker = "extra == 'test'", specifier = ">=2.18.0" },
+    { name = "html2text", specifier = ">=2025.4.15" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "markdown-it-py", specifier = ">=3.0.0" },
+    { name = "py-key-value-aio", specifier = ">=0.3.0" },
+    { name = "py-key-value-aio", extras = ["filetree"], marker = "extra == 'disk'", specifier = ">=0.3.0" },
+    { name = "py-key-value-aio", extras = ["valkey"], marker = "extra == 'valkey'", specifier = ">=0.3.0" },
+    { name = "pyjwt", specifier = ">=2.12.0" },
+    { name = "pypdf", specifier = ">=6.13.3" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.0" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.3.0" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
+    { name = "pytest-asyncio", marker = "extra == 'test'", specifier = ">=0.23.0" },
+    { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "pytz", specifier = ">=2026.1.post1" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "requests", marker = "extra == 'dev'", specifier = ">=2.32.3" },
+    { name = "requests", marker = "extra == 'test'", specifier = ">=2.32.3" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12.4" },
+    { name = "tomlkit", marker = "extra == 'dev'", specifier = ">=0.13.3" },
+    { name = "tomlkit", marker = "extra == 'release'", specifier = ">=0.13.3" },
+    { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0.0" },
+    { name = "twine", marker = "extra == 'release'", specifier = ">=5.0.0" },
+    { name = "urllib3", specifier = ">=2.7.0" },
+]
+provides-extras = ["gcs", "disk", "valkey", "test", "release", "dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "google-cloud-storage", specifier = ">=2.18.0" },
+    { name = "pytest", specifier = ">=8.3.0" },
+    { name = "pytest-asyncio", specifier = ">=0.23.0" },
+    { name = "requests", specifier = ">=2.32.3" },
+    { name = "ruff", specifier = ">=0.12.4" },
+    { name = "tomlkit", specifier = ">=0.13.3" },
+    { name = "twine", specifier = ">=5.0.0" },
+]
+disk = [{ name = "py-key-value-aio", extras = ["filetree"], specifier = ">=0.3.0" }]
+release = [
+    { name = "tomlkit", specifier = ">=0.13.3" },
+    { name = "twine", specifier = ">=5.0.0" },
+]
+test = [
+    { name = "google-cloud-storage", specifier = ">=2.18.0" },
+    { name = "pytest", specifier = ">=8.3.0" },
+    { name = "pytest-asyncio", specifier = ">=0.23.0" },
+    { name = "requests", specifier = ">=2.32.3" },
+]
+valkey = [{ name = "py-key-value-aio", extras = ["valkey"], specifier = ">=0.3.0" }]
+
+[[package]]
 name = "googleapis-common-protos"
 version = "1.74.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2230,148 +2372,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9a/3f/f70e03f40ffc9a30d817eef7da1be72ee4956ba8d7255c399a01b135902a/websockets-16.0-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:a653aea902e0324b52f1613332ddf50b00c06fdaf7e92624fbf8c77c78fa5767", size = 178735, upload-time = "2026-01-10T09:23:42.259Z" },
     { url = "https://files.pythonhosted.org/packages/6f/28/258ebab549c2bf3e64d2b0217b973467394a9cea8c42f70418ca2c5d0d2e/websockets-16.0-py3-none-any.whl", hash = "sha256:1637db62fad1dc833276dded54215f2c7fa46912301a24bd94d45d46a011ceec", size = 171598, upload-time = "2026-01-10T09:23:45.395Z" },
 ]
-
-[[package]]
-name = "workspace-mcp"
-version = "1.23.0"
-source = { editable = "." }
-dependencies = [
-    { name = "cryptography" },
-    { name = "defusedxml" },
-    { name = "fastapi" },
-    { name = "fastmcp" },
-    { name = "google-api-python-client" },
-    { name = "google-auth-httplib2" },
-    { name = "google-auth-oauthlib" },
-    { name = "html2text" },
-    { name = "httpx" },
-    { name = "markdown-it-py" },
-    { name = "py-key-value-aio" },
-    { name = "pyjwt" },
-    { name = "pypdf" },
-    { name = "python-dotenv" },
-    { name = "pytz" },
-    { name = "pyyaml" },
-    { name = "urllib3" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "google-cloud-storage" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "requests" },
-    { name = "ruff" },
-    { name = "tomlkit" },
-    { name = "twine" },
-]
-disk = [
-    { name = "py-key-value-aio", extra = ["filetree"] },
-]
-gcs = [
-    { name = "google-cloud-storage" },
-]
-release = [
-    { name = "tomlkit" },
-    { name = "twine" },
-]
-test = [
-    { name = "google-cloud-storage" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "requests" },
-]
-valkey = [
-    { name = "py-key-value-aio", extra = ["valkey"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "google-cloud-storage" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "requests" },
-    { name = "ruff" },
-    { name = "tomlkit" },
-    { name = "twine" },
-]
-disk = [
-    { name = "py-key-value-aio", extra = ["filetree"] },
-]
-release = [
-    { name = "tomlkit" },
-    { name = "twine" },
-]
-test = [
-    { name = "google-cloud-storage" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "requests" },
-]
-valkey = [
-    { name = "py-key-value-aio", extra = ["valkey"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "cryptography", specifier = ">=48.0.1" },
-    { name = "defusedxml", specifier = ">=0.7.1" },
-    { name = "fastapi", specifier = ">=0.115.12" },
-    { name = "fastmcp", specifier = ">=3.4.2" },
-    { name = "google-api-python-client", specifier = ">=2.168.0" },
-    { name = "google-auth-httplib2", specifier = ">=0.2.0" },
-    { name = "google-auth-oauthlib", specifier = ">=1.2.2" },
-    { name = "google-cloud-storage", marker = "extra == 'dev'", specifier = ">=2.18.0" },
-    { name = "google-cloud-storage", marker = "extra == 'gcs'", specifier = ">=2.18.0" },
-    { name = "google-cloud-storage", marker = "extra == 'test'", specifier = ">=2.18.0" },
-    { name = "html2text", specifier = ">=2025.4.15" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "markdown-it-py", specifier = ">=3.0.0" },
-    { name = "py-key-value-aio", specifier = ">=0.3.0" },
-    { name = "py-key-value-aio", extras = ["filetree"], marker = "extra == 'disk'", specifier = ">=0.3.0" },
-    { name = "py-key-value-aio", extras = ["valkey"], marker = "extra == 'valkey'", specifier = ">=0.3.0" },
-    { name = "pyjwt", specifier = ">=2.12.0" },
-    { name = "pypdf", specifier = ">=6.13.3" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.0" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.3.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
-    { name = "pytest-asyncio", marker = "extra == 'test'", specifier = ">=0.23.0" },
-    { name = "python-dotenv", specifier = ">=1.1.0" },
-    { name = "pytz", specifier = ">=2026.1.post1" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "requests", marker = "extra == 'dev'", specifier = ">=2.32.3" },
-    { name = "requests", marker = "extra == 'test'", specifier = ">=2.32.3" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12.4" },
-    { name = "tomlkit", marker = "extra == 'dev'", specifier = ">=0.13.3" },
-    { name = "tomlkit", marker = "extra == 'release'", specifier = ">=0.13.3" },
-    { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0.0" },
-    { name = "twine", marker = "extra == 'release'", specifier = ">=5.0.0" },
-    { name = "urllib3", specifier = ">=2.7.0" },
-]
-provides-extras = ["gcs", "disk", "valkey", "test", "release", "dev"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "google-cloud-storage", specifier = ">=2.18.0" },
-    { name = "pytest", specifier = ">=8.3.0" },
-    { name = "pytest-asyncio", specifier = ">=0.23.0" },
-    { name = "requests", specifier = ">=2.32.3" },
-    { name = "ruff", specifier = ">=0.12.4" },
-    { name = "tomlkit", specifier = ">=0.13.3" },
-    { name = "twine", specifier = ">=5.0.0" },
-]
-disk = [{ name = "py-key-value-aio", extras = ["filetree"], specifier = ">=0.3.0" }]
-release = [
-    { name = "tomlkit", specifier = ">=0.13.3" },
-    { name = "twine", specifier = ">=5.0.0" },
-]
-test = [
-    { name = "google-cloud-storage", specifier = ">=2.18.0" },
-    { name = "pytest", specifier = ">=8.3.0" },
-    { name = "pytest-asyncio", specifier = ">=0.23.0" },
-    { name = "requests", specifier = ">=2.32.3" },
-]
-valkey = [{ name = "py-key-value-aio", extras = ["valkey"], specifier = ">=0.3.0" }]
 
 [[package]]
 name = "zipp"

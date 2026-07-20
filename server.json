@@ -7,7 +7,7 @@
   "packages": [
     {
       "registryType": "pypi",
-      "identifier": "workspace-mcp",
+      "identifier": "google-workspace-mcp-with-body-save",
       "transport": {
         "type": "stdio"
       },

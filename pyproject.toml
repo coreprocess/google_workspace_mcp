@@ -3,9 +3,9 @@ requires = [ "setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "workspace-mcp"
+name = "google-workspace-mcp-with-body-save"
 version = "1.23.0"
-description = "Comprehensive, highly performant Google Workspace Streamable HTTP & SSE MCP Server for Calendar, Gmail, Docs, Sheets, Slides & Drive"
+description = "Temporary fork of workspace-mcp adding save-body-to-file support for Gmail message/thread content, published while the change awaits upstream merge. Comprehensive, highly performant Google Workspace Streamable HTTP & SSE MCP Server for Calendar, Gmail, Docs, Sheets, Slides & Drive"
 readme = "README.md"
 keywords = [ "mcp", "google", "workspace", "llm", "ai", "claude", "model", "context", "protocol", "server"]
 license = "MIT"
@@ -62,6 +62,8 @@ Changelog = "https://github.com/taylorwilsdon/google_workspace_mcp/releases"
 [project.scripts]
 workspace-mcp = "main:main"
 workspace-cli = "core.cli:main"
+# Alias matching the fork's distribution name so `uvx google-workspace-mcp-with-body-save` resolves an entry point of the same name.
+google-workspace-mcp-with-body-save = "main:main"
 
 [project.optional-dependencies]
 gcs = [

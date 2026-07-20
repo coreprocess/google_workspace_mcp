@@ -468,7 +468,7 @@ def main():
     display_url = external_url if external_url else f"{base_uri}:{port}"
 
     try:
-        version = metadata.version("workspace-mcp")
+        version = metadata.version("google-workspace-mcp-with-body-save")
     except metadata.PackageNotFoundError:
         version = "dev"
 

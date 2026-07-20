@@ -24,13 +24,13 @@ Run an instance and connect Claude to it via a **Connector** — see the [Quick 
 
 ```bash
 # Instant run (no install)
-uvx workspace-mcp
+uvx google-workspace-mcp-with-body-save
 
 # With specific tools only
-uvx workspace-mcp --tools gmail drive calendar
+uvx google-workspace-mcp-with-body-save --tools gmail drive calendar
 
 # With tool tier
-uvx workspace-mcp --tool-tier core
+uvx google-workspace-mcp-with-body-save --tool-tier core
 ```
 
 ### Environment Variables
@@ -228,14 +228,14 @@ Choose a tier based on your needs:
 | **Complete** | 111 | Full API: comments, headers, admin functions |
 
 ```bash
-uvx workspace-mcp --tool-tier core      # Start minimal
-uvx workspace-mcp --tool-tier extended  # Add management
-uvx workspace-mcp --tool-tier complete  # Everything
+uvx google-workspace-mcp-with-body-save --tool-tier core      # Start minimal
+uvx google-workspace-mcp-with-body-save --tool-tier extended  # Add management
+uvx google-workspace-mcp-with-body-save --tool-tier complete  # Everything
 ```
 
 Mix tiers with specific services:
 ```bash
-uvx workspace-mcp --tools gmail drive --tool-tier extended
+uvx google-workspace-mcp-with-body-save --tools gmail drive --tool-tier extended
 ```
 
 ---
@@ -309,7 +309,7 @@ When you first call a tool:
 Best for Claude Desktop and local MCP clients:
 
 ```bash
-uvx workspace-mcp
+uvx google-workspace-mcp-with-body-save
 ```
 
 ### HTTP (Streamable)
@@ -317,7 +317,7 @@ uvx workspace-mcp
 For web interfaces, debugging, or multi-client setups:
 
 ```bash
-uvx workspace-mcp --transport streamable-http
+uvx google-workspace-mcp-with-body-save --transport streamable-http
 ```
 
 Access at `http://localhost:8000/mcp/`
@@ -343,7 +343,7 @@ docker run -p 8000:8000 \
   "mcpServers": {
     "google_workspace": {
       "command": "uvx",
-      "args": ["workspace-mcp", "--tool-tier", "core"],
+      "args": ["google-workspace-mcp-with-body-save", "--tool-tier", "core"],
       "env": {
         "GOOGLE_OAUTH_CLIENT_ID": "your-client-id",
         "GOOGLE_OAUTH_CLIENT_SECRET": "your-secret",
@@ -361,7 +361,7 @@ docker run -p 8000:8000 \
   "mcpServers": {
     "google_workspace": {
       "command": "uvx",
-      "args": ["workspace-mcp"],
+      "args": ["google-workspace-mcp-with-body-save"],
       "env": {
         "GOOGLE_OAUTH_CLIENT_ID": "your-client-id",
         "GOOGLE_OAUTH_CLIENT_SECRET": "your-secret",

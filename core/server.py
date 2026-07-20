@@ -545,7 +545,7 @@ def configure_server_for_http():
                 except ImportError as exc:
                     logger.warning(
                         "OAuth 2.1: Valkey client_storage requested but Valkey dependencies are not installed (%s). "
-                        "Install 'workspace-mcp[valkey]' (or 'py-key-value-aio[valkey]', which includes 'valkey-glide') "
+                        "Install 'google-workspace-mcp-with-body-save[valkey]' (or 'py-key-value-aio[valkey]', which includes 'valkey-glide') "
                         "or unset WORKSPACE_MCP_OAUTH_PROXY_STORAGE_BACKEND/WORKSPACE_MCP_OAUTH_PROXY_VALKEY_HOST.",
                         exc,
                     )
@@ -703,7 +703,7 @@ def get_auth_provider() -> Optional[GoogleProvider]:
 @server.custom_route("/health", methods=["GET"])
 async def health_check(request: Request):
     try:
-        version = metadata.version("workspace-mcp")
+        version = metadata.version("google-workspace-mcp-with-body-save")
     except metadata.PackageNotFoundError:
         version = "dev"
     return JSONResponse(
