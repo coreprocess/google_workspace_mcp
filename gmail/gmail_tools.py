@@ -12,7 +12,6 @@ import re
 import ssl
 import mimetypes
 import html
-from html.parser import HTMLParser
 from pathlib import Path
 from typing import Annotated, Optional, List, Dict, Literal, Any
 from urllib.parse import unquote, urlparse, urlunsplit
@@ -21,6 +20,7 @@ from email.message import EmailMessage
 from email.policy import SMTP
 from email.utils import formataddr
 
+import html2text
 import httpx
 from mcp.types import ToolAnnotations
 
@@ -69,6 +69,8 @@ logger = logging.getLogger(__name__)
 GMAIL_BATCH_SIZE = 25
 GMAIL_REQUEST_DELAY = 0.1
 HTML_BODY_TRUNCATE_LIMIT = 20000
+# Marker phrases are matched against word-normalized text (lowercase words
+# separated by single spaces, no punctuation), so they must be word-normalized too.
 LOW_VALUE_TEXT_PLACEHOLDERS = (
     "your client does not support html",
     "view this email in your browser",
@@ -76,50 +78,76 @@ LOW_VALUE_TEXT_PLACEHOLDERS = (
 )
 LOW_VALUE_TEXT_FOOTER_MARKERS = (
     "mailing list",
-    "mailman/listinfo",
+    "mailman listinfo",
     "unsubscribe",
-    "list-unsubscribe",
+    "list unsubscribe",
     "manage preferences",
 )
-LOW_VALUE_TEXT_HTML_DIFF_MIN = 80
+LOW_VALUE_WORD_DIFF_MIN = 15
 CONTENT_ID_SAFE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+\-@]*$")
-
-
-class _HTMLTextExtractor(HTMLParser):
-    """Extract readable text from HTML using stdlib."""
-
-    def __init__(self):
-        super().__init__()
-        self._text = []
-        self._skip = False
-
-    def handle_starttag(self, tag, attrs):
-        if tag in ("script", "style"):
-            self._skip = True
-            return
-        if tag == "br" and not self._skip:
-            self._text.append(" ")
-
-    def handle_endtag(self, tag):
-        if tag in ("script", "style"):
-            self._skip = False
-
-    def handle_data(self, data):
-        if not self._skip:
-            self._text.append(data)
-
-    def get_text(self) -> str:
-        return " ".join("".join(self._text).split())
+MD_LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")  # [label](url) -> label
+URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
 
 
 def _html_to_text(html: str) -> str:
-    """Convert HTML to readable plain text."""
+    """Convert HTML to readable plain text (Markdown-flavored)."""
     try:
-        parser = _HTMLTextExtractor()
-        parser.feed(html)
-        return parser.get_text()
+        converter = html2text.HTML2Text()
+        converter.body_width = 0  # no hard line-wrapping
+        converter.ignore_images = True  # drop logos/tracking pixels
+        converter.ignore_emphasis = True
+        return converter.handle(html).strip()
     except Exception:
         return html
+
+
+def _normalize_words(text: str) -> List[str]:
+    """Reduce text to lowercase word tokens for comparing MIME alternatives.
+
+    Markdown links keep their label (the target URL is plumbing); any URL that
+    remains visible becomes the single sentinel word "url" so it counts as
+    content while representational differences between the text/plain and
+    text/html parts (raw URL vs. anchor text vs. tracking redirect) can't
+    break the comparison.
+    """
+    text = MD_LINK_RE.sub(r"\1", text)
+    text = URL_RE.sub(" url ", text)
+    return re.findall(r"[^\W_]+", text.lower())
+
+
+def _plain_is_low_value(plain_words: List[str], html_words: List[str]) -> bool:
+    """Decide whether the text/plain part is a useless stand-in for the HTML.
+
+    Operates on word-normalized token lists (see _normalize_words) so the
+    checks are immune to punctuation, whitespace, markup, and URL drift
+    between the two MIME parts.
+    """
+    if not plain_words:
+        return False
+
+    # Pad with spaces for whole-word phrase matching ("unsubscribed" must not
+    # match the "unsubscribe" marker).
+    padded = f" {' '.join(plain_words)} "
+    html_richer = len(html_words) >= len(plain_words) + LOW_VALUE_WORD_DIFF_MIN
+
+    # Known placeholder phrases mark the plain part as a stub outright.
+    if any(f" {marker} " in padded for marker in LOW_VALUE_TEXT_PLACEHOLDERS):
+        return True
+
+    # Footer-only plain part: known list/footer markers plus much richer HTML.
+    if html_richer and any(
+        f" {marker} " in padded for marker in LOW_VALUE_TEXT_FOOTER_MARKERS
+    ):
+        return True
+
+    # Appended-boilerplate detector (keyword-free): the plain part is exactly
+    # the tail of the HTML's words and the HTML says much more. Suffix rather
+    # than containment on purpose: appended footers land at the end, while a
+    # mid-body match usually means a legitimate plain-text rendition.
+    if html_richer and html_words[-len(plain_words) :] == plain_words:
+        return True
+
+    return False
 
 
 def _extract_message_body(payload):
@@ -228,23 +256,17 @@ def _format_body_content(
     html_stripped = html_body.strip()
     html_text = _html_to_text(html_stripped).strip() if html_stripped else ""
 
-    plain_lower = " ".join(text_stripped.split()).lower()
-    html_lower = " ".join(html_text.split()).lower()
-    plain_is_low_value = plain_lower and (
-        any(marker in plain_lower for marker in LOW_VALUE_TEXT_PLACEHOLDERS)
-        or (
-            any(marker in plain_lower for marker in LOW_VALUE_TEXT_FOOTER_MARKERS)
-            and len(html_lower) >= len(plain_lower) + LOW_VALUE_TEXT_HTML_DIFF_MIN
-        )
-        or (
-            len(html_lower) >= len(plain_lower) + LOW_VALUE_TEXT_HTML_DIFF_MIN
-            and html_lower.endswith(plain_lower)
-        )
-    )
+    # Word-normalized views are used for the decision only, never for output.
+    plain_words = _normalize_words(text_stripped)
+    html_words = _normalize_words(html_text)
 
-    # Prefer plain text, but fall back to HTML when plain text is empty or clearly low-value.
-    use_html = html_text and (
-        not text_stripped or "<!--" in text_stripped or plain_is_low_value
+    # Prefer plain text, but fall back to HTML when plain text is wordless or
+    # clearly low-value. Gating on html_words keeps image-only HTML (zero
+    # readable words) from ever displacing a real plain part.
+    use_html = bool(html_words) and (
+        not plain_words
+        or "<!--" in text_stripped
+        or _plain_is_low_value(plain_words, html_words)
     )
 
     if use_html:
