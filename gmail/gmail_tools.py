@@ -150,6 +150,17 @@ def _plain_is_low_value(plain_words: List[str], html_words: List[str]) -> bool:
     return False
 
 
+def _pad_urlsafe_b64(data: str) -> str:
+    """
+    Re-pad a base64url string to a multiple of 4 characters.
+
+    Google APIs serialize bytes fields as base64url frequently WITHOUT '='
+    padding (RFC 4648 §5), which the strict stdlib decoder rejects with
+    "Incorrect padding". Padding an already-padded value is a no-op.
+    """
+    return data + "=" * (-len(data) % 4)
+
+
 def _extract_message_body(payload):
     """
     Helper function to extract plain text body from a Gmail message payload.
@@ -187,9 +198,9 @@ def _extract_message_bodies(payload):
 
         if body_data:
             try:
-                decoded_data = base64.urlsafe_b64decode(body_data).decode(
-                    "utf-8", errors="ignore"
-                )
+                decoded_data = base64.urlsafe_b64decode(
+                    _pad_urlsafe_b64(body_data)
+                ).decode("utf-8", errors="ignore")
                 if mime_type == "text/plain" and not text_body:
                     text_body = decoded_data
                 elif mime_type == "text/html" and not html_body:
@@ -204,9 +215,9 @@ def _extract_message_bodies(payload):
     # Check the main payload if it has body data directly
     if payload.get("body", {}).get("data"):
         try:
-            decoded_data = base64.urlsafe_b64decode(payload["body"]["data"]).decode(
-                "utf-8", errors="ignore"
-            )
+            decoded_data = base64.urlsafe_b64decode(
+                _pad_urlsafe_b64(payload["body"]["data"])
+            ).decode("utf-8", errors="ignore")
             mime_type = payload.get("mimeType", "")
             if mime_type == "text/plain" and not text_body:
                 text_body = decoded_data
@@ -292,9 +303,8 @@ def _decode_raw_mime_content(raw_data: str) -> str:
     if not raw_data:
         return "[No raw content found]"
 
-    padded_raw = raw_data + "=" * (-len(raw_data) % 4)
     try:
-        decoded_raw = base64.urlsafe_b64decode(padded_raw).decode(
+        decoded_raw = base64.urlsafe_b64decode(_pad_urlsafe_b64(raw_data)).decode(
             "utf-8", errors="replace"
         )
     except (binascii.Error, ValueError) as exc:
@@ -657,7 +667,7 @@ def _format_base64_content_block(urlsafe_b64_data: str) -> List[str]:
         decode, returns a single warning line instead of raising.
     """
     try:
-        raw_bytes = base64.urlsafe_b64decode(urlsafe_b64_data)
+        raw_bytes = base64.urlsafe_b64decode(_pad_urlsafe_b64(urlsafe_b64_data))
         standard_b64 = base64.b64encode(raw_bytes).decode("ascii")
         return [
             f"\n📦 Base64 content ({len(standard_b64)} chars, standard base64):",
@@ -2531,9 +2541,8 @@ async def _forward_gmail_message_impl(
                 # tolerantly and re-encode as standard, padded base64 so the
                 # downstream base64.b64decode() in _prepare_gmail_message succeeds.
                 urlsafe_data = attachment_data.get("data", "")
-                padded = urlsafe_data + "=" * (-len(urlsafe_data) % 4)
                 standard_b64 = base64.b64encode(
-                    base64.urlsafe_b64decode(padded)
+                    base64.urlsafe_b64decode(_pad_urlsafe_b64(urlsafe_data))
                 ).decode()
                 attachments_to_send.append(
                     {

@@ -249,6 +249,37 @@ class TestSingleMessage:
         assert files[0].read_bytes() == mime_bytes
 
     @pytest.mark.asyncio
+    async def test_raw_body_with_unpadded_base64url_saved(self, isolated_storage_env):
+        """Gmail's raw field is base64url without '=' padding; save must not fail."""
+        # Length not a multiple of 3 so the encoded form requires padding.
+        mime_bytes = b"Subject: Example subject\r\n\r\nUnpadded raw body\r\n.."
+        raw_b64_unpadded = base64.urlsafe_b64encode(mime_bytes).decode().rstrip("=")
+        assert len(raw_b64_unpadded) % 4 != 0, "fixture must actually be unpadded"
+
+        service = _build_service(
+            message_responses={
+                ("msg-1", "metadata"): _metadata_response("msg-1"),
+                ("msg-1", "raw"): {"id": "msg-1", "raw": raw_b64_unpadded},
+            }
+        )
+
+        result = await _unwrap(get_gmail_message_content)(
+            service=service,
+            message_id="msg-1",
+            user_google_email="user@example.com",
+            body_format="raw",
+            save_body_to_file=True,
+        )
+
+        assert "--- BODY SAVED TO FILE ---" in result
+        assert "Failed to save body to file" not in result
+
+        files = _saved_files(isolated_storage_env)
+        assert len(files) == 1
+        assert files[0].suffix == ".eml"
+        assert files[0].read_bytes() == mime_bytes
+
+    @pytest.mark.asyncio
     async def test_filename_derived_from_subject(self, isolated_storage_env):
         service = _build_service(
             message_responses={

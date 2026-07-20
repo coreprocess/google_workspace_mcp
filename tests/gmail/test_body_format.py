@@ -356,6 +356,19 @@ class TestExtractMessageBodies:
         assert bodies["text"] == ""
         assert bodies["html"] == ""
 
+    def test_decodes_unpadded_base64url_body_data(self):
+        """Gmail serializes body data as base64url without '=' padding."""
+        text = "Unpadded text."  # 14 bytes -> unpadded base64 length % 4 != 0
+        unpadded = _encode(text).rstrip("=")
+        assert len(unpadded) % 4 != 0, "fixture must actually be unpadded"
+
+        payload = {
+            "mimeType": "text/plain",
+            "body": {"data": unpadded},
+        }
+        bodies = _extract_message_bodies(payload)
+        assert bodies["text"] == text
+
     def test_handles_nested_multipart(self):
         payload = {
             "mimeType": "multipart/mixed",
